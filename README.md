@@ -1,7 +1,7 @@
 <h1 align="center">Hi 👋, I'm Sumit Kumar!</h1>
 <h3 align="center">🌟Data Engineer - Empowering Data for Future Advancements🌟</h3>
 
-👋 Welcome to my data engineering journey! I'm a motivated, optimistic and result-driven Data professional with over 9 years of experience in 𝗗𝗮𝘁𝗮𝗯𝗿𝗶𝗰𝗸𝘀, 𝗦𝗽𝗮𝗿𝗸, SQL, 𝗗𝗮𝘁𝗮 𝗟𝗮𝗸𝗲𝗵𝗼𝘂𝘀𝗲, Cloud, 𝗗𝗮𝘁𝗮 𝗪𝗮𝗿𝗲𝗵𝗼𝘂𝘀𝗶𝗻𝗴, **Data Modeling (ERwin)**, 𝗘𝗧𝗟, Talend, Datastage, database operations, and more. 
+👋 Welcome to my data engineering journey! I'm a motivated, optimistic and result-driven Data professional with over 9 years of experience in **Data Management, Cloud, Data Warehousing, Data Modeling (ERwin), ETL** using 𝗗𝗮𝘁𝗮𝗯𝗿𝗶𝗰𝗸𝘀, 𝗦𝗽𝗮𝗿𝗸, SQL, Talend, Datastage, database operations, and more. 
 
 🌱 I’m currently working in **Tredence Inc**, and prefer to leverage upto date technologies to extract insights, streamline processes, and build robust data pipelines.
 
