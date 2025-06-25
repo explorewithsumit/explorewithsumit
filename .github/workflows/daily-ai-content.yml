@@ -1,0 +1,35 @@
+name: Daily Data Engineering Content Generation
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # every day at midnight UTC
+
+jobs:
+  generate-content:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install openai
+
+      - name: Generate content using OpenAI
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: node generate-content.js
+
+      - name: Commit and push content
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add content/
+          git commit -m "Automated content generation for data engineering"
+          git push
+        continue-on-error: true  # avoid failure if no changes
