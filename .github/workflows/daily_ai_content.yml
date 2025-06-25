@@ -1,100 +1,50 @@
-name: Daily AI Content Generation
+- name: Generate AI content using OpenAI API
+  id: generate
+  env:
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  run: |
+    TOPICS=(
+      "Data Lake vs Data Warehouse"
+      "ETL vs ELT"
+      "Stream Processing vs Batch Processing"
+      "Data Pipeline Best Practices"
+      "Data Quality in Engineering"
+      "Metadata Management"
+      "Data Orchestration Tools"
+      "Cloud Data Engineering Trends"
+      "Data Engineering for Machine Learning"
+      "Scaling Data Pipelines"
+    )
+    RANDOM_TOPIC=${TOPICS[$RANDOM % ${#TOPICS[@]}]}
+    echo "Selected topic: $RANDOM_TOPIC"
+    PROMPT="Write a detailed article about the following Data Engineering topic:\n$RANDOM_TOPIC"
 
-on:
-  workflow_dispatch:       # Manual trigger; change to schedule for daily runs
-  schedule:
-    - cron: '0 1 * * *'  # Uncomment to run daily at 1 AM UTC
+    RESPONSE_RAW=$(curl -s https://api.openai.com/v1/chat/completions \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer $OPENAI_API_KEY" \
+      -d @- <<EOF
+{
+  "model": "gpt-3.5-turbo",
+  "messages": [{"role": "user", "content": "$PROMPT"}],
+  "max_tokens": 700,
+  "temperature": 0.7
+}
+EOF
+    )
 
-permissions:
-  contents: write          # Needed for committing changes
+    echo "Raw API response:"
+    echo "$RESPONSE_RAW"
 
-jobs:
-  generate-content:
-    runs-on: ubuntu-latest
+    RESPONSE=$(echo "$RESPONSE_RAW" | jq -r '.choices[0].message.content')
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    echo "Parsed AI content:"
+    echo "$RESPONSE"
 
-      - name: Generate AI content using OpenAI API
-        id: generate
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          # Check if API key is set
-          if [ -z "$OPENAI_API_KEY" ]; then
-            echo "ERROR: OPENAI_API_KEY is not set. Exiting."
-            exit 1
-          else
-            echo "OPENAI_API_KEY is set."
-          fi
+    SAFE_TOPIC=$(echo "$RANDOM_TOPIC" | tr ' ' '_')
 
-          # Define topics array
-          TOPICS=(
-            "Data Lake vs Data Warehouse"
-            "ETL vs ELT"
-            "Stream Processing vs Batch Processing"
-            "Data Pipeline Best Practices"
-            "Data Quality in Engineering"
-            "Metadata Management"
-            "Data Orchestration Tools"
-            "Cloud Data Engineering Trends"
-            "Data Engineering for Machine Learning"
-            "Scaling Data Pipelines"
-          )
+    DATE=$(date +'%Y-%m-%d')
+    FILENAME="Data_Engineering_${SAFE_TOPIC}_${DATE}.md"
 
-          # Pick a random topic
-          RANDOM_TOPIC="${TOPICS[$RANDOM % ${#TOPICS[@]}]}"
-          echo "Selected topic: $RANDOM_TOPIC"
+    echo -e "# $RANDOM_TOPIC\n\n$RESPONSE" > "$FILENAME"
 
-          # Prepare prompt for AI
-          PROMPT="Write a detailed article about the following Data Engineering topic:\n$RANDOM_TOPIC"
-
-          # Call OpenAI API with JSON payload built by jq
-          RESPONSE_RAW=$(curl -s https://api.openai.com/v1/chat/completions \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $OPENAI_API_KEY" \
-            -d "$(jq -n \
-              --arg prompt "$PROMPT" \
-              '{
-                model: "gpt-3.5-turbo",
-                messages: [{role: "user", content: $prompt}],
-                max_tokens: 700,
-                temperature: 0.7
-              }')"
-          )
-
-          echo "Raw API response:"
-          echo "$RESPONSE_RAW"
-
-          # Extract content from response
-          RESPONSE=$(echo "$RESPONSE_RAW" | jq -r '.choices[0].message.content // empty')
-
-          if [ -z "$RESPONSE" ]; then
-            echo "ERROR: No content received from OpenAI API."
-            echo "Full response was:"
-            echo "$RESPONSE_RAW"
-            exit 1
-          fi
-
-          # Sanitize topic for filename: replace spaces with underscores, remove non-alphanumerics except _
-          SAFE_TOPIC=$(echo "$RANDOM_TOPIC" | tr ' ' '_' | tr -cd '[:alnum:]_')
-
-          DATE=$(date +'%Y-%m-%d')
-          FILENAME="Data_Engineering_${SAFE_TOPIC}_${DATE}.md"
-
-          # Write the content to markdown file
-          echo -e "# $RANDOM_TOPIC\n\n$RESPONSE" > "$FILENAME"
-
-          echo "Generated file: $FILENAME"
-
-          # Pass filename as output for next steps if needed
-          echo "filename=$FILENAME" >> $GITHUB_OUTPUT
-
-      - name: Commit and push AI content file
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Add AI-generated content for ${{ steps.generate.outputs.filename }}"
-          file_pattern: "*.md"
-          branch: main
-          
+    echo "filename=$FILENAME" >> $GITHUB_OUTPUT
