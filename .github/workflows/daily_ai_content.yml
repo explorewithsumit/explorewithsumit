@@ -64,6 +64,6 @@ jobs:
     - name: Commit and push AI content file
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
-        commit_message: "Add AI-generated content for ${{ steps.generate.outputs.filename }}"
+        commit_message: "Adding content for ${{ steps.generate.outputs.filename }}"
         file_pattern: "*.md"
         branch: main
