@@ -1,0 +1,51 @@
+name: Daily Word Toggle
+
+on:
+  schedule:
+    # Runs daily at midnight UTC
+    # Adjust cron expression if a different time is preferred.
+    # For example, '0 12 * * *' for noon UTC
+    - cron: '0 0 * * *'
+
+permissions:
+  contents: write # This permission is necessary for the workflow to commit changes
+
+jobs:
+  toggle-word:
+    runs-on: ubuntu-latest # The type of runner to use for the job
+
+    steps:
+    - name: Checkout repository # Action to check out your repository code
+      uses: actions/checkout@v4
+
+    - name: Set file and word variables
+      run: |
+        echo "FILE_PATH=status.txt" >> $GITHUB_ENV
+        echo "TOGGLE_WORD=world" >> $GITHUB_ENV
+
+    - name: Toggle word in file
+      run: |
+        if [ -f "$FILE_PATH" ]; then
+          if grep -q "$TOGGLE_WORD" "$FILE_PATH"; then
+            echo "Word '$TOGGLE_WORD' found. Removing it."
+            # Use sed to remove the word and any blank lines it might leave
+            sed -i "/$TOGGLE_WORD/d" "$FILE_PATH"
+          else
+            echo "Word '$TOGGLE_WORD' not found. Adding it."
+            # Add the word to a new line at the end of the file
+            echo "$TOGGLE_WORD" >> "$FILE_PATH"
+          fi
+        else
+          echo "File $FILE_PATH does not exist. Creating it with the word."
+          echo "$TOGGLE_WORD" > "$FILE_PATH"
+        fi
+      env:
+        FILE_PATH: ${{ env.FILE_PATH }}
+        TOGGLE_WORD: ${{ env.TOGGLE_WORD }}
+
+
+    - name: Commit and push changes # Action to automatically commit and push any changes
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: 'Automated: Daily word toggle'
+        branch: main
