@@ -3,9 +3,9 @@ import requests
 import random
 from datetime import date
 
-# ✅ Get Hugging Face token from environment variable
+# Get Hugging Face token from environment variable
 HUGGINGFACE_API_TOKEN = os.getenv("HUGGINGFACE_API_TOKEN")
-API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct"
+API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
 
 HEADERS = {
     "Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}",
@@ -39,7 +39,7 @@ def generate_article(topic):
     response = requests.post(API_URL, headers=HEADERS, json=payload)
 
     if response.status_code != 200:
-        print(f"❌ Error: {response.status_code} - {response.text}")
+        print(f"Error: {response.status_code} - {response.text}")
         raise Exception("Failed to generate content")
 
     json_data = response.json()
@@ -55,14 +55,14 @@ def save_article(topic, content):
     with open(filename, "w", encoding="utf-8") as f:
         f.write(f"# {topic}\n\n{content}\n")
     
-    print(f"✅ Article saved as: {filename}")
+    print(f"Article saved as: {filename}")
 
 def main():
     topic = random.choice(TOPICS)
-    print(f"🧠 Selected topic: {topic}")
+    print(f"Selected topic: {topic}")
     
     content = generate_article(topic)
-    print(f"✅ Content generated.\n")
+    print(f"Content generated.\n")
     
     save_article(topic, content)
 
