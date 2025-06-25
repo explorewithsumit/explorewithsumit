@@ -1,1 +1,16 @@
-npm init -y
+{
+  "name": "explorewithsumit",
+  "version": "1.0.0",
+  "description": "Automated data engineering content generation",
+  "main": "generate-content.js",
+  "type": "module",  <-- Add this line
+  "scripts": {
+    "start": "node generate-content.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "openai": "^4.x.x"
+  }
+}
