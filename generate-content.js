@@ -31,7 +31,7 @@ async function generateContent() {
     const hf = new HfInference(process.env.HUGGINGFACE_API_TOKEN);
 
     const result = await hf.textGeneration({
-      model: "mistralai/Mistral-7B-Instruct-v0.1", // ✅ Free open model
+      model: "OpenAssistant/oasst-sft-1-pythia-12b", // ✅ Free open model
       inputs: prompt,
       parameters: {
         max_new_tokens: 700,
