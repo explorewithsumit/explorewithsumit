@@ -1,44 +1,57 @@
-- name: Generate AI content using OpenAI API
-  id: generate
-  env:
-    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  run: |
-    TOPICS=(
-      "Data Lake vs Data Warehouse"
-      "ETL vs ELT"
-      "Stream Processing vs Batch Processing"
-      "Data Pipeline Best Practices"
-      "Data Quality in Engineering"
-      "Metadata Management"
-      "Data Orchestration Tools"
-      "Cloud Data Engineering Trends"
-      "Data Engineering for Machine Learning"
-      "Scaling Data Pipelines"
-    )
-    RANDOM_TOPIC=${TOPICS[$RANDOM % ${#TOPICS[@]}]}
-    echo "Selected topic: $RANDOM_TOPIC"
-    PROMPT="Write a detailed article about the following Data Engineering topic:\n$RANDOM_TOPIC"
+name: Generate AI Content
 
-    RESPONSE_RAW=$(curl -s https://api.openai.com/v1/chat/completions \
-      -H "Content-Type: application/json" \
-      -H "Authorization: Bearer $OPENAI_API_KEY" \
-      -d @- <<EOF
-{
-  "model": "gpt-3.5-turbo",
-  "messages": [{"role": "user", "content": "$PROMPT"}],
-  "max_tokens": 700,
-  "temperature": 0.7
-}
-EOF
-    )
+on:
+  workflow_dispatch:  # You can change this to 'schedule' or 'push' as needed
 
-    RESPONSE=$(echo "$RESPONSE_RAW" | jq -r '.choices[0].message.content')
+jobs:
+  generate-content:
+    runs-on: ubuntu-latest
 
-    SAFE_TOPIC=$(echo "$RANDOM_TOPIC" | tr ' ' '_')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    DATE=$(date +'%Y-%m-%d')
-    FILENAME="${SAFE_TOPIC}_${DATE}.md"
+      - name: Generate AI content using OpenAI API
+        id: generate
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          TOPICS=(
+            "Data Lake vs Data Warehouse"
+            "ETL vs ELT"
+            "Stream Processing vs Batch Processing"
+            "Data Pipeline Best Practices"
+            "Data Quality in Engineering"
+            "Metadata Management"
+            "Data Orchestration Tools"
+            "Cloud Data Engineering Trends"
+            "Data Engineering for Machine Learning"
+            "Scaling Data Pipelines"
+          )
 
-    echo -e "# $RANDOM_TOPIC\n\n$RESPONSE" > "$FILENAME"
+          RANDOM_TOPIC="${TOPICS[$RANDOM % ${#TOPICS[@]}]}"
+          echo "Selected topic: $RANDOM_TOPIC"
+          PROMPT="Write a detailed article about the following Data Engineering topic:\n$RANDOM_TOPIC"
 
-    echo "filename=$FILENAME" >> $GITHUB_OUTPUT
+          RESPONSE_RAW=$(curl -s https://api.openai.com/v1/chat/completions \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $OPENAI_API_KEY" \
+            -d "$(jq -n \
+              --arg prompt "$PROMPT" \
+              '{
+                model: "gpt-3.5-turbo",
+                messages: [{role: "user", content: $prompt}],
+                max_tokens: 700,
+                temperature: 0.7
+              }')"
+          )
+
+          RESPONSE=$(echo "$RESPONSE_RAW" | jq -r '.choices[0].message.content')
+
+          SAFE_TOPIC=$(echo "$RANDOM_TOPIC" | tr ' ' '_' | tr -d ':')
+          DATE=$(date +'%Y-%m-%d')
+          FILENAME="${SAFE_TOPIC}_${DATE}.md"
+
+          echo -e "# $RANDOM_TOPIC\n\n$RESPONSE" > "$FILENAME"
+
+          echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
