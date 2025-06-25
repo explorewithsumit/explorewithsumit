@@ -135,7 +135,7 @@ def generate_article(topic):
 
     json_data = response.json()
     text = json_data[0]["generated_text"] if isinstance(json_data, list) else json_data.get("generated_text", "")
-
+    content = text.replace(prompt, "").strip()
     return text.strip()
 
 def save_article(topic, content):
