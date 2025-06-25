@@ -1,12 +1,6 @@
 {
-  "name": "explorewithsumit",
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "start": "node generate-content.js"
-  },
   "dependencies": {
     "dotenv": "^16.3.1",
-    "@huggingface/inference": "^2.6.0"
+    "node-fetch": "^3.4.0"
   }
 }
