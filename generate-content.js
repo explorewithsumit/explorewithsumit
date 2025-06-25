@@ -1,63 +1,51 @@
+// generate-content.js
+
+import { config } from 'dotenv';
 import fs from 'fs';
-import path from 'path';
-import OpenAI from 'openai';
+import { HfInference } from '@huggingface/inference';
 
-// Initialize OpenAI client with API key from environment variable
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+config(); // Load .env
 
-// List of random data engineering topics
 const topics = [
-  "Data Lake Architecture",
+  "Data Lake vs Data Warehouse",
   "ETL vs ELT",
-  "Apache Airflow Basics",
-  "Data Partitioning Strategies",
-  "Streaming Data with Apache Kafka",
-  "Data Quality Best Practices",
-  "Building Scalable Data Pipelines",
-  "Data Warehouse vs Data Lakehouse",
-  "Schema Evolution in Big Data",
-  "Data Orchestration with Prefect",
+  "Stream Processing vs Batch Processing",
+  "Data Pipeline Best Practices",
+  "Data Quality in Engineering",
+  "Metadata Management",
+  "Data Orchestration Tools",
+  "Cloud Data Engineering Trends",
+  "Data Engineering for Machine Learning",
+  "Scaling Data Pipelines"
 ];
 
-// Function to pick a random topic
-function getRandomTopic() {
-  const index = Math.floor(Math.random() * topics.length);
-  return topics[index];
-}
+// 1. Pick a random topic
+const topic = topics[Math.floor(Math.random() * topics.length)];
+const prompt = `Write a detailed article about the following Data Engineering topic:\n\n${topic}`;
+
+const safeFilename = topic.replace(/[^a-zA-Z0-9]/g, '_');
+const filename = `Data_Engineering_${safeFilename}_${new Date().toISOString().split('T')[0]}.md`;
 
 async function generateContent() {
-  const topic = getRandomTopic();
-  const prompt = `Write a detailed, technical article about the topic: "${topic}" in data engineering. Include explanations and examples where relevant.`;
-
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "You are an expert data engineer and technical writer." },
-        { role: "user", content: prompt },
-      ],
+    const hf = new HfInference(process.env.HUGGINGFACE_API_TOKEN);
+
+    const result = await hf.textGeneration({
+      model: "mistralai/Mistral-7B-Instruct-v0.1", // ✅ Free open model
+      inputs: prompt,
+      parameters: {
+        max_new_tokens: 700,
+        temperature: 0.7,
+        do_sample: true
+      },
     });
 
-    const content = response.choices[0].message.content.trim();
+    const content = result.generated_text;
 
-    // Prepare filename with topic and timestamp
-    const safeTopic = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    const timestamp = new Date().toISOString().split('T')[0];
-    const filename = path.join('content', `${timestamp}-${safeTopic}.md`);
-
-    // Ensure content directory exists
-    if (!fs.existsSync('content')) {
-      fs.mkdirSync('content');
-    }
-
-    // Write content to file
     fs.writeFileSync(filename, `# ${topic}\n\n${content}`);
-
-    console.log(`Content generated and saved to ${filename}`);
+    console.log(`✅ Content written to ${filename}`);
   } catch (error) {
-    console.error("Error generating content:", error);
+    console.error("❌ Failed to generate content:", error.message || error);
     process.exit(1);
   }
 }
