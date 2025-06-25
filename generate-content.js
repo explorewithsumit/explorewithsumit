@@ -31,7 +31,7 @@ async function generateContent() {
     const hf = new HfInference(process.env.HUGGINGFACE_API_TOKEN);
 
     const result = await hf.textGeneration({
-      model: "OpenAssistant/oasst-sft-1-pythia-12b", // ✅ Free open model
+      model: "tiiuae/falcon-7b-instruct", 
       inputs: prompt,
       parameters: {
         max_new_tokens: 700,
@@ -43,7 +43,7 @@ async function generateContent() {
     const content = result.generated_text;
 
     fs.writeFileSync(filename, `# ${topic}\n\n${content}`);
-    console.log(`✅ Content written to ${filename}`);
+    console.log(`Content written to ${filename}`);
   } catch (error) {
     console.error("❌ Failed to generate content:", error.message || error);
     process.exit(1);
