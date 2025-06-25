@@ -141,7 +141,7 @@ def generate_article(topic):
 def save_article(topic, content):
     safe_topic = topic.replace(" ", "_").replace("/", "_")
     today = date.today().isoformat()
-    output_dir = "DataEngineeringBlogs"
+    output_dir = os.path.join(os.getcwd(), "DataEngineeringBlogs")
     os.makedirs(output_dir, exist_ok=True)
     filename = os.path.join(output_dir, f"{safe_topic}_{today}.md")
     
