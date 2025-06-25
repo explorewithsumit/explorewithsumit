@@ -1,7 +1,7 @@
 name: Generate AI Content
 
 on:
-  workflow_dispatch:  # You can change this to 'schedule' or 'push' as needed
+  workflow_dispatch:
 
 jobs:
   generate-content:
@@ -16,6 +16,13 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "ERROR: OPENAI_API_KEY is not set"
+            exit 1
+          else
+            echo "OPENAI_API_KEY is set"
+          fi
+
           TOPICS=(
             "Data Lake vs Data Warehouse"
             "ETL vs ELT"
@@ -31,25 +38,37 @@ jobs:
 
           RANDOM_TOPIC="${TOPICS[$RANDOM % ${#TOPICS[@]}]}"
           echo "Selected topic: $RANDOM_TOPIC"
-          
-          RESPONSE_RAW=$(jq -n \
-          --arg prompt "Write a detailed article about the following Data Engineering topic:\n$RANDOM_TOPIC" \
-          '{
-            model: "gpt-3.5-turbo",
-            messages: [{role: "user", content: $prompt}],
-            max_tokens: 700,
-            temperature: 0.7
-          }' | curl -s https://api.openai.com/v1/chat/completions \
+          PROMPT="Write a detailed article about the following Data Engineering topic:\n$RANDOM_TOPIC"
+
+          RESPONSE_RAW=$(curl -s https://api.openai.com/v1/chat/completions \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer '"$OPENAI_API_KEY"'" \
-            -d @-)
+            -H "Authorization: Bearer $OPENAI_API_KEY" \
+            -d "$(jq -n \
+              --arg prompt "$PROMPT" \
+              '{
+                model: "gpt-3.5-turbo",
+                messages: [{role: "user", content: $prompt}],
+                max_tokens: 700,
+                temperature: 0.7
+              }')"
+          )
 
-          RESPONSE=$(echo "$RESPONSE_RAW" | jq -r '.choices[0].message.content')
+          echo "Raw API response:"
+          echo "$RESPONSE_RAW"
 
-          SAFE_TOPIC=$(echo "$RANDOM_TOPIC" | tr ' ' '_' | tr -d ':')
+          RESPONSE=$(echo "$RESPONSE_RAW" | jq -r '.choices[0].message.content // empty')
+
+          if [ -z "$RESPONSE" ]; then
+            echo "No content received from OpenAI API."
+            echo "Full response was:"
+            echo "$RESPONSE_RAW"
+            exit 1
+          fi
+
+          SAFE_TOPIC=$(echo "$RANDOM_TOPIC" | tr ' ' '_' | tr -cd '[:alnum:]_')
           DATE=$(date +'%Y-%m-%d')
-          FILENAME="${SAFE_TOPIC}_${DATE}.md"
+          FILENAME="Data_Engineering_${SAFE_TOPIC}_${DATE}.md"
 
           echo -e "# $RANDOM_TOPIC\n\n$RESPONSE" > "$FILENAME"
 
-          echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
+          echo "filename=$FILENAME" >> $GITHUB_OUTPUT
