@@ -134,9 +134,17 @@ def generate_article(topic):
         raise Exception("Failed to generate content")
 
     json_data = response.json()
-    text = json_data[0]["generated_text"] if isinstance(json_data, list) else json_data.get("generated_text", "")
-    content = text.replace(prompt, "").strip()
-    return text.strip()
+    raw_text = json_data[0]["generated_text"]
+    cleaned_text = raw_text.replace(prompt, "").strip()
+    if cleaned_text.lower().startswith(topic.lower()):
+        cleaned_text = cleaned_text[len(topic):].strip()
+
+    return cleaned_text
+    
+    # json_data = response.json()
+    # text = json_data[0]["generated_text"] if isinstance(json_data, list) else json_data.get("generated_text", "")
+    # content = text.replace(prompt, "").strip()
+    # return text.strip()
 
 def save_article(topic, content):
     safe_topic = topic.replace(" ", "_").replace("/", "_")
