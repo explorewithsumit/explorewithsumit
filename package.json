@@ -11,7 +11,7 @@
   "author": "Sumit Kumar",
   "license": "ISC",
   "dependencies": {
-    "openai": "^4.21.1",  // Latest stable version as of June 2025
-    "dotenv": "^16.3.1"    // For secure API key management
+    "openai": "^4.21.1",  
+    "dotenv": "^16.3.1"   
   }
 }
