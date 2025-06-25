@@ -2,10 +2,8 @@ name: Daily Word Toggle
 
 on:
   schedule:
-    # Runs daily at midnight UTC
-    # Adjust cron expression if a different time is preferred.
-    # For example, '0 12 * * *' for noon UTC
     - cron: '0 0 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write # This permission is necessary for the workflow to commit changes
