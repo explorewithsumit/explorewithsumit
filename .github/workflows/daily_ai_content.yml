@@ -34,7 +34,6 @@ EOF
 
     RESPONSE=$(echo "$RESPONSE_RAW" | jq -r '.choices[0].message.content')
 
-    # Sanitize topic for filename (replace spaces with underscores)
     SAFE_TOPIC=$(echo "$RANDOM_TOPIC" | tr ' ' '_')
 
     DATE=$(date +'%Y-%m-%d')
