@@ -117,7 +117,7 @@ TOPICS = [
 ]
 
 def generate_article(topic):
-    prompt = f"Write a detailed article about the following Data Engineering topic:\n\n{topic}"
+    prompt = f"Write a detailed article about the following Data Engineering topic with subtopics and in bullet points:\n\n{topic}"
     payload = {
         "inputs": prompt,
         "parameters": {
