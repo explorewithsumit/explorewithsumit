@@ -31,20 +31,18 @@ jobs:
 
           RANDOM_TOPIC="${TOPICS[$RANDOM % ${#TOPICS[@]}]}"
           echo "Selected topic: $RANDOM_TOPIC"
-          PROMPT="Write a detailed article about the following Data Engineering topic:\n$RANDOM_TOPIC"
-
-          RESPONSE_RAW=$(curl -s https://api.openai.com/v1/chat/completions \
+          
+          RESPONSE_RAW=$(jq -n \
+          --arg prompt "Write a detailed article about the following Data Engineering topic:\n$RANDOM_TOPIC" \
+          '{
+            model: "gpt-3.5-turbo",
+            messages: [{role: "user", content: $prompt}],
+            max_tokens: 700,
+            temperature: 0.7
+          }' | curl -s https://api.openai.com/v1/chat/completions \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $OPENAI_API_KEY" \
-            -d "$(jq -n \
-              --arg prompt "$PROMPT" \
-              '{
-                model: "gpt-3.5-turbo",
-                messages: [{role: "user", content: $prompt}],
-                max_tokens: 700,
-                temperature: 0.7
-              }')"
-          )
+            -H "Authorization: Bearer '"$OPENAI_API_KEY"'" \
+            -d @-)
 
           RESPONSE=$(echo "$RESPONSE_RAW" | jq -r '.choices[0].message.content')
 
