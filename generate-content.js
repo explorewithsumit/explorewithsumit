@@ -1,10 +1,9 @@
 // generate-content.js
-
 import { config } from 'dotenv';
 import fs from 'fs';
-import { HfInference } from '@huggingface/inference';
+import { InferenceClient } from '@huggingface/inference';
 
-config(); // Load .env
+config(); // loads HUGGINGFACE_API_TOKEN
 
 const topics = [
   "Data Lake vs Data Warehouse",
@@ -19,33 +18,39 @@ const topics = [
   "Scaling Data Pipelines"
 ];
 
-// 1. Pick a random topic
 const topic = topics[Math.floor(Math.random() * topics.length)];
-const prompt = `Write a detailed article about the following Data Engineering topic:\n\n${topic}`;
-
+const prompt = `Write a detailed article about the following Data Engineering topic in bullet points in 2 or 3 sub topics only:\n\n${topic}`;
 const safeFilename = topic.replace(/[^a-zA-Z0-9]/g, '_');
 const filename = `Data_Engineering_${safeFilename}_${new Date().toISOString().split('T')[0]}.md`;
 
 async function generateContent() {
   try {
-    const hf = new HfInference(process.env.HUGGINGFACE_API_TOKEN);
+    const hf = new InferenceClient({
+      token: process.env.HUGGINGFACE_API_TOKEN,
+      provider: 'hf-inference'
+    });
 
-    const result = await hf.textGeneration({
-      model: "tiiuae/falcon-7b-instruct", 
+    const model = "tiiuae/falcon-7b-instruct";
+
+    console.log(`Using model: ${model}`);
+    const resp = await hf.textGeneration({
+      model,
       inputs: prompt,
       parameters: {
         max_new_tokens: 700,
         temperature: 0.7,
         do_sample: true
-      },
+      }
     });
 
-    const content = result.generated_text;
+    const content = Array.isArray(resp) ? resp[0]?.generated_text : resp.generated_text;
+    if (!content) throw new Error('No generated text returned.');
 
     fs.writeFileSync(filename, `# ${topic}\n\n${content}`);
     console.log(`Content written to ${filename}`);
-  } catch (error) {
-    console.error("❌ Failed to generate content:", error.message || error);
+
+  } catch (err) {
+    console.error("Generation failed:", err.message || err);
     process.exit(1);
   }
 }
