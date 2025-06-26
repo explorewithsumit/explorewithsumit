@@ -2,7 +2,8 @@ name: Daily Word Toggle
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *'      # Runs daily at midnight
+    - cron: '0 12 */2 * *'   # Runs at noon every alternate day
   workflow_dispatch:
 
 permissions:
