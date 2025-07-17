@@ -5,7 +5,7 @@ from datetime import date
 
 # Get Hugging Face token from environment variable
 HUGGINGFACE_API_TOKEN = os.getenv("HUGGINGFACE_API_TOKEN")
-API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct"
+API_URL = "https://api-inference.huggingface.co/models/mistralai/Devstral-Small-2507"
 
 HEADERS = {
     "Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}",
