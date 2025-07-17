@@ -1,9 +1,9 @@
 <h1 align="center">Hi 👋, I'm Sumit Kumar!</h1>
 <h3 align="center">🌟Data Engineer - Empowering Data for Future Advancements🌟</h3>
 
-👋 Welcome to my data engineering journey! I'm a motivated, optimistic and result-driven Data professional with over 9 years of experience in **Data Management, Cloud, Data Warehousing, Data Modeling (ERwin), ETL** using 𝗗𝗮𝘁𝗮𝗯𝗿𝗶𝗰𝗸𝘀, 𝗦𝗽𝗮𝗿𝗸, SQL, Talend, Datastage, database operations, and more. 
+👋 Welcome to my data engineering journey! I'm a motivated, optimistic and result-driven Data professional with over 9 years of experience in **Data Management, Cloud, Data Warehousing, Data Modeling, ETL** using 𝗗𝗮𝘁𝗮𝗯𝗿𝗶𝗰𝗸𝘀, 𝗦𝗽𝗮𝗿𝗸, SQL, Talend, Datastage, database operations, and more. 
 
-🌱 I’m currently working in **Tredence Inc**, and prefer to leverage upto date technologies to extract insights, streamline processes, and build robust data pipelines.
+🌱 I’m currently working in **Tredence Inc**, and prefer to leverage upto date technologies to extract insights, streamline processes, and build robust data pipelines. At present, I'm working as Data Modeler for a UK based retail giant, using **ERwin**, **Power Designer**, etc.
 
 🚀 As a data engineer & data modeler, I'm constantly exploring innovative ways to optimize data infrastructure and ensure scalability. My repository is a testament to my ongoing pursuit of learning and improvement in the field of data engineering.
 
@@ -23,6 +23,7 @@
 <p align="left">
 <a href="https://databricks.com/" target="_blank"> <img src="https://databricks.com/wp-content/uploads/2020/04/og-databricks.png" alt="databricks" width="90" height="60"/> </a> 
 <a href="https://www.erwin.com/products/erwin-data-modeler/" target="_blank"> <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrDnIWbNQW2kFOt9msapwG3-SJuiv-faA2qA&s" alt="Erwin DM" width="60" height="60"/> </a>
+<a href="https://www.powerdesigner.biz/" target="_blank"> <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB-hOUTjHq8ze1qrfWsY3hYxfXsvFFDGEmWw&s" alt="Erwin DM" width="60" height="60"/> </a>
 <a href="https://delta.io/" target="_blank"> <img src="https://www.databricks.com/sites/default/files/delta-lake-logo.png" alt="Delta Lake" width="80" height="60"/> </a> 
 <a href="https://www.getdbt.com/" target="_blank"> <img src="https://logowik.com/content/uploads/images/dbt5596.jpg" alt="dbt" width="60" height="60"/> </a> 
 <a href="https://spark.apache.org/" target="_blank"> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Apache_Spark_logo.svg/1200px-Apache_Spark_logo.svg.png" alt="spark" width="60" height="60"/> </a> 
